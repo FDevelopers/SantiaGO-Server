@@ -3,7 +3,7 @@ const router = express.Router();
 const sqlConnection = require("../data/mysqlConnection");
 
 router.get("/", (req, res) => {
-  try {
+  /* try {
     sqlConnection.query(
       `SELECT * FROM vehiculo where idvehiculo = ${1}`,
       function (error, results, fields) {
@@ -15,12 +15,23 @@ router.get("/", (req, res) => {
   } catch (error) {
     console.log(error);
     res.send("Error", error);
-  }
+  }*/
 });
 
 router.post("/", (req, res) => {
-  console.log(req.body);
-  try {
+  res.json(
+    {
+    id: 1,
+    cod: req.body.cod_usuario,
+    name: "Fernando",
+    last_name: "Disla", 
+    balance: 100,
+    passed: true  ,
+  }
+  
+  );
+
+  /*try {
     sqlConnection.query(
       `UPDATE vehiculo SET latitud = '${req.body.lat}', longitud = '${
         req.body.lgn
@@ -33,32 +44,7 @@ router.post("/", (req, res) => {
     console.log(error);
     res.send("Error", error);
   }
-  //console.log(req.body);
-});
-
-router.get("/d", (req, res) => {
-  sqlConnection.connect();
-  sqlConnection.query(
-    `SELECT * FROM terminal where idvehiculo = ${1}`,
-    function (error, results, fields) {
-      if (error) throw error;
-      res.json({
-        results,
-      });
-    }
-  );
-  sqlConnection.end();
-});
-
-router.post("/2", (req, res) => {
-  sqlConnection.connect();
-  sqlConnection.query("QUERY", function (error, results, fields) {
-    if (error) throw error;
-    res.json({
-      results,
-    });
-  });
-  sqlConnection.end();
+  //console.log(req.body);*/
 });
 
 module.exports = router;

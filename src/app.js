@@ -13,6 +13,8 @@ app.use(bodyParser.json());
 
 //Routes
 app.use("/api/terminal", require("./routes/terminal.routes"));
+app.use("/api/passenger", require("./routes/passenger.routes"));
+
 
 app.listen(port, () => {
   console.log(`Listen on port ${port}`);
