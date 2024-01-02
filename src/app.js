@@ -12,8 +12,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 //Routes
-app.use("/api/terminal", require("./routes/terminal.routes"));
-app.use("/api/passenger", require("./routes/passenger.routes"));
+app.use("/api/vehicle", require("./routes/vehicle.routes"));
+app.use("/api/user", require("./routes/user.routes"));
+app.use("/api/maps", require("./routes/maps.routes"));
 
 
 app.listen(port, () => {
