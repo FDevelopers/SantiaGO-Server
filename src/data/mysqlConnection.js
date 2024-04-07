@@ -4,7 +4,7 @@ const connection = mysql.createConnection({
   host: "maptest.ddns.net",
   user: "fdeveloper",
   password: "Root1234@",
-  database: "santiago_db",
+  database: "santiago_db_v2",
 });
 
 /*const connection = mysql.createConnection({
