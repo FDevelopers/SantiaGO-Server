@@ -16,6 +16,7 @@ app.use("/api/vehicle", require("./routes/vehicle.routes"));
 app.use("/api/user", require("./routes/user.routes"));
 app.use("/api/maps", require("./routes/maps.routes"));
 app.use("/api/cards", require("./routes/cards.routes"));
+app.use("/admin", require("./routes/admin.routes"));
 
 
 app.listen(port, () => {
