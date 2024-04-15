@@ -2,83 +2,143 @@ const express = require("express");
 const router = express.Router();
 const sqlConnection = require("../data/mysqlConnection");
 
+// Obtener vehículos
 router.get("/", (req, res) => {
+  const search = req.query.param ? req.query.param : "";
+
   try {
-    sqlConnection.query(
-      `SELECT * FROM vehiculo where idvehiculo = ${1}`,
-      function (error, results, fields) {
-        res.json({
-          results,
-        });
+    const query = `SELECT * FROM Vehiculo WHERE VehicleEnable = ? AND (marca LIKE ? OR placa LIKE ?)`;
+    const values = [1, `${search}%`, `${search}%`];
+
+    sqlConnection.query(query, values, function (error, results, fields) {
+      if (error) {
+        console.error("Error al consultar la base de datos:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+      } else {
+        res.status(200).json({ results });
       }
-    );
+    });
   } catch (error) {
-    console.log(error);
-    res.send("Error", error);
+    console.error(error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
+// Registrar Vehículo
 router.post("/", (req, res) => {
-  console.log(req.body);
-  try {
-    sqlConnection.query(
-      `UPDATE vehiculo SET latitud = '${req.body.lat}', longitud = '${
-        req.body.lgn
-      }' where idvehiculo = '${1}'`,
-      function (error, results, fields) {
-        res.send("Acutualizado Correctamente");
-      }
-    );
-  } catch (error) {
-    console.log(error);
-    res.send("Error", error);
-  }
-  //console.log(req.body);
-});
+  const vehicle = req.body;
+  console.log(vehicle);
+  if (
+    vehicle.marca.length > 0 &&
+    vehicle.modelo.length > 0 &&
+    vehicle.anio.length > 0 &&
+    vehicle.placa.length > 0 &&
+    vehicle.color.length > 0 &&
+    vehicle.fkChofer &&
+    vehicle.fkRuta
+  ) {
+    try {
+      const query = `INSERT INTO Vehiculo (ficha, placa, fkChofer, fkRuta, marca, modelo, color, anio) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`;
+      const values = [
+        vehicle.ficha,
+        vehicle.placa,
+        vehicle.fkChofer,
+        vehicle.fkRuta,
+        vehicle.marca,
+        vehicle.modelo,
+        vehicle.color,
+        vehicle.anio,
+      ];
 
-router.get("/list", (req, res) => {
-  try {
-    sqlConnection.query(
-      `SELECT 
-      santiago_db.Vehiculo.id,
-      santiago_db.Vehiculo.ficha,
-      santiago_db.Vehiculo.placa,
-      santiago_db.Ruta.descripcion AS ruta,
-      CONCAT(santiago_db.Chofer.nombre, ' ', santiago_db.Chofer.apellido) AS chofer,
-      santiago_db.Vehiculo.lastLat,
-      santiago_db.Vehiculo.lastLgn,
-      santiago_db.Vehiculo.asientosDisponibles
-      FROM santiago_db.Vehiculo
-      INNER JOIN santiago_db.Ruta ON santiago_db.Vehiculo.fkRuta = santiago_db.Ruta.id
-      INNER JOIN santiago_db.Chofer ON santiago_db.Vehiculo.fkChofer = santiago_db.Chofer.id;`,
-      function (error, results, fields) {
+      sqlConnection.query(query, values, function (error, results, fields) {
         if (error) {
-          console.log(error);
+          console.error("Error al insertar en la base de datos:", error);
+          res.status(500).json({ error: "Error interno del servidor" });
+        } else {
+          res.status(200).json({ status: "Vehículo registrado" });
         }
-
-        const vh = [];
-
-        results.map((item) => {
-          vh.push({
-            ficha: item.ficha,
-            placa: item.placa,
-            ruta: item.ruta,
-            chofer: item.chofer,
-            asientos_disponibles: item.asientosDisponibles,
-            position: {
-              latitude: item.lastLat,
-              longitude: item.lastLgn,
-            },
-          });
-        });
-
-        res.status(200).json(vh);
-      }
-    );
-  } catch (error) {
-    res.send("Error", error);
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  } else {
+    res
+      .status(400)
+      .json({ error: "Vehículo sin datos completos para registrar" });
   }
 });
 
+// Actualizar Vehículo
+router.put("/", (req, res) => {
+  const vehicle = req.body;
+  console.log(vehicle);
+  try {
+    const query = `UPDATE Vehiculo 
+                       SET ficha = ?, placa = ?, fkChofer = ?, fkRuta = ?, marca = ?, modelo = ?, color = ?, anio = ?
+                       WHERE id = ?`;
+    const values = [
+      vehicle.ficha,
+      vehicle.placa,
+      vehicle.fkChofer,
+      vehicle.fkRuta,
+      vehicle.marca,
+      vehicle.modelo,
+      vehicle.color,
+      vehicle.anio,
+      vehicle.id,
+    ];
+
+    sqlConnection.query(query, values, function (error, results, fields) {
+      if (error) {
+        console.error("Error al actualizar en la base de datos:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+      } else {
+        console.log(vehicle);
+
+        res.status(200).json({ status: "Vehículo actualizado" });
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+// Eliminar Vehículo
+router.delete("/", (req, res) => {
+  const vehicleId = req.query.id;
+  try {
+    if (vehicleId) {
+      const query = `DELETE FROM Vehiculo WHERE id = ?`;
+      const values = [vehicleId];
+
+      sqlConnection.query(query, values, function (error, results, fields) {
+        if (error) {
+          console.error(
+            "Error al eliminar vehículo en la base de datos:",
+            error
+          );
+          res.status(500).json({ error: "Error interno del servidor" });
+        } else {
+          if (results.affectedRows > 0) {
+            res.status(200).json({ status: "Vehículo eliminado" });
+          } else {
+            res
+              .status(404)
+              .json({ error: "El vehículo con el ID proporcionado no existe" });
+          }
+        }
+      });
+    } else {
+      res.status(400).json({
+        error: "No se proporcionó el ID del vehículo para eliminar",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
 
 module.exports = router;
