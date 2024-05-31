@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const sqlConnection = require("../data/mysqlConnection");
+const transporter = require("../data/mailer");
 
 router.get("/list", (req, res) => {
   try {
@@ -175,11 +176,36 @@ router.post("/login", (req, res) => {
       if (usuario.userPassword === userPassword && usuario.UserEnable) {
         // Eliminar la contraseña del objeto usuario antes de enviarlo
         delete usuario.userPassword;
-        console.log(usuario)
+        console.log(usuario);
         res.status(200).json({ message: "Inicio de sesión exitoso", usuario });
       } else {
         res.status(401).json({ message: "Credenciales inválidas" });
       }
+    } else {
+      res.status(404).json({ message: "Usuario no encontrado" });
+    }
+  });
+});
+
+router.post("/getpassword", (req, res) => {
+  const { userName } = req.body;
+  const sql = "SELECT * FROM Usuario WHERE userName = ?";
+  sqlConnection.query(sql, [userName], async (error, results, fields) => {
+    if (error) {
+      console.error("Error en la consulta SQL:", error);
+      return res.status(500).json({ message: "Error en el servidor" });
+    }
+    if (results.length > 0) {
+      const usuario = results[0];
+      const result = await transporter.sendMail({
+        from: "fdisla1608@hotmail.com",
+        to: "fdisla1608@gmail.com",
+        subject: `Plataforma SantiaGO - La Contraseña del ${usuario.userName} es: ${usuario.userPassword}`,
+      });
+
+      console.log(result);
+
+      res.status(200).json({ message: "Enviado Correctamente" });
     } else {
       res.status(404).json({ message: "Usuario no encontrado" });
     }
