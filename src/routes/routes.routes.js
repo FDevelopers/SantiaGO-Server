@@ -31,7 +31,7 @@ router.post("/", (req, res) => {
   if (rutas.description.length > 0) {
     try {
       const query = `INSERT INTO Ruta VALUES(0, ?, ?, ?, ?)`;
-      const values = [rutas.description, rutas.coordinates, rutas.color, true];
+      const values = [rutas.description, JSON.stringify(rutas.coordinates), rutas.color, true];
 
       sqlConnection.query(query, values, function (error, results, fields) {
         if (error) {
