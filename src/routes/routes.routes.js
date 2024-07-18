@@ -27,11 +27,11 @@ router.get("/", (req, res) => {
 router.post("/", (req, res) => {
   const rutas = req.body;
   console.log(rutas);
-  
+
   if (rutas.description.length > 0) {
     try {
       const query = `INSERT INTO Ruta VALUES(0, ?, ?, ?, ?)`;
-      const values = [rutas.description, rutas.polygon, rutas.color, true];
+      const values = [rutas.description, rutas.coordinates, rutas.color, true];
 
       sqlConnection.query(query, values, function (error, results, fields) {
         if (error) {
