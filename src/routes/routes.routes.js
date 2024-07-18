@@ -26,6 +26,8 @@ router.get("/", (req, res) => {
 //Registrar Usuario
 router.post("/", (req, res) => {
   const rutas = req.body;
+  console.log(rutas);
+  
   if (rutas.description.length > 0) {
     try {
       const query = `INSERT INTO Ruta VALUES(0, ?, ?, ?, ?)`;
@@ -45,9 +47,7 @@ router.post("/", (req, res) => {
       res.status(500).json({ error: "Error interno del servidor" });
     }
   } else {
-    res
-      .status(400)
-      .json({ error: "Usuario sin datos completos para registrar" });
+    res.status(400).json({ error: "Usuario sin datos completos para registrar" });
   }
 });
 
@@ -75,9 +75,7 @@ router.put("/", (req, res) => {
       res.status(500).json({ error: "Error interno del servidor" });
     }
   } else {
-    res
-      .status(400)
-      .json({ error: "Usuario sin datos completos para actualizar" });
+    res.status(400).json({ error: "Usuario sin datos completos para actualizar" });
   }
 });
 
@@ -93,10 +91,7 @@ router.delete("/", (req, res) => {
 
       sqlConnection.query(query, values, function (error, results, fields) {
         if (error) {
-          console.error(
-            "Error al deshabilitar usuario en la base de datos:",
-            error
-          );
+          console.error("Error al deshabilitar usuario en la base de datos:", error);
           res.status(500).json({ error: "Error interno del servidor" });
         } else {
           if (results.affectedRows > 0) {
@@ -104,9 +99,7 @@ router.delete("/", (req, res) => {
             res.status(200).json({ status: "Usuario deshabilitado" });
           } else {
             console.log("El usuario con el ID proporcionado no existe");
-            res
-              .status(404)
-              .json({ error: "El usuario con el ID proporcionado no existe" });
+            res.status(404).json({ error: "El usuario con el ID proporcionado no existe" });
           }
         }
       });

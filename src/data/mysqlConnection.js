@@ -2,8 +2,8 @@ const mysql = require("mysql");
 
 const connection = mysql.createConnection({
   host: "maptest.ddns.net",
-  user: "fdeveloper",
-  password: "Root1234@",
+  user: "client",
+  password: "root1234",
   database: "santiago_db_v2",
 });
 
