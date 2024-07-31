@@ -2,7 +2,7 @@ const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const port = 3005;
+const port = 3001;
 const app = express();
 
 //Middlewares
