@@ -51,11 +51,12 @@ router.post("/", (req, res) => {
     user.userName.length > 0
   ) {
     try {
-      const query = `INSERT INTO Usuario VALUES(0, ?, ?, ?, ?, ?,?)`;
+      const query = `INSERT INTO Usuario VALUES(0, ?, ?, ?, ?, ?,?,?)`;
       const values = [
         user.nombre,
         user.apellido,
         "1930-12-01",
+        "@",
         user.userName,
         user.userPassword,
         true,
@@ -84,6 +85,7 @@ router.post("/", (req, res) => {
 //Actualizar Usuario
 router.put("/", (req, res) => {
   const user = req.body;
+  console.log(req.body)
   if (
     user.nombre.length > 0 &&
     user.apellido.length > 0 &&
